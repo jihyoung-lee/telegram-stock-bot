@@ -9,7 +9,7 @@ def get_price(stock_code):
 
     price = soup.select_one("p.no_today span.blind")
 
-    if price:
+    if price and price.text:
         return f"📈 현재 주가는 {price.text}원입니다."
     return "📉 주가 정보를 가져올 수 없습니다."
 
