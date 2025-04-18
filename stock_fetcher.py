@@ -15,7 +15,7 @@ def get_price(stock_code):
     code_name = code_tag.get("alt").strip() if code_tag else "시장 정보 없음"
 
     if price and price.text:
-        return f"🏷️시장구분: {code_name}\n📌종목명: {name_tag.text}\n 현재 주가는 📈{price.text}원입니다."
+        return f"🏷️시장구분: {code_name}\n📌종목명: {name_tag.text} ({stock_code})\n 현재 주가는 📈{price.text}원입니다."
     return "📉 주가 정보를 가져올 수 없습니다."
 
 def get_stock_code(keyword):
