@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from config import TELEGRAM_BOT_TOKEN
 from stock_fetcher import get_price, get_stock_code
 from news_crawler import get_stock_news
-from stock_chart import fetch_daily_price, draw_graph
+from stock_chart import fetch_daily_price, draw_candle_chart
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("안녕하세요! 📈 최신 주식 정보를 제공하는 봇입니다 ")
@@ -18,9 +18,9 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result = get_price(stock_code)
 
     df = fetch_daily_price(stock_code)
-    chart = draw_graph(df, title="최근 주가 추이")
+    chart = draw_candle_chart(df, title="최근 주가 추이")
     await update.message.reply_text(result)
-    await update.message.reply_photo(photo=chart, caption="최근 5일간의 종가 그래프입니다.")
+    await update.message.reply_photo(photo=chart, caption="최근 5일간의 캔들 차트 입니다.")
 
 async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:

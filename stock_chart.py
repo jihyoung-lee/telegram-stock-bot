@@ -1,8 +1,9 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import requests
-from io import BytesIO
-from io import StringIO
+import pandas as pd
+import mplfinance as mpf
+import matplotlib.font_manager as fm
+from io import BytesIO, StringIO
+
 
 
 def fetch_daily_price(stock_code, pages=1):
@@ -16,27 +17,29 @@ def fetch_daily_price(stock_code, pages=1):
         dfs.append(df)
     data = pd.concat(dfs)
     data = data.dropna()
-    data.columns = ['날짜', '종가', '전일비', '시가', '고가', '저가', '거래량']
+    data.columns = ['날짜', 'close', '전일비', 'open', 'high', 'low', 'volume']
     data['날짜'] = pd.to_datetime(data['날짜'])
-    data = data.sort_values('날짜')
-    return data[['날짜', '종가']]
+    data = data.set_index('날짜')
+    data = data.sort_index()
+    return data[['open', 'high', 'low', 'close', 'volume']]
 
-def draw_graph(df, title="종가 추이"):
+def draw_candle_chart(df, title="📊 캔들차트"):
+    # 한글 폰트 강제 지정
+    font_path = "C:/Windows/Fonts/malgun.ttf"
+    font_name = fm.FontProperties(fname=font_path).get_name()
 
-    # 한글 깨짐 방지
-    plt.rcParams['font.family'] = 'Malgun Gothic'
-    plt.rcParams['axes.unicode_minus'] = False
+    # 스타일을 charles 기반으로 만들고 폰트 지정
+    my_style = mpf.make_mpf_style(base_mpf_style='charles', rc={'font.family': font_name})
 
-    plt.figure(figsize=(8, 4))
-    plt.plot(df['날짜'], df['종가'], marker='o', linestyle='-')
-    plt.title(title)
-    plt.xlabel("날짜")
-    plt.ylabel("종가")
-    plt.grid(True)
-    plt.tight_layout()
-
+    # 차트 그리기 + 이미지 저장
     buf = BytesIO()
-    plt.savefig(buf, format='png')
+    mpf.plot(
+        df[-10:],
+        type='candle',
+        style=my_style,
+        title=title,
+        ylabel='가격',
+        savefig=dict(fname=buf, format='png')
+    )
     buf.seek(0)
-    plt.close()
     return buf
