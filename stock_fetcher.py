@@ -1,6 +1,7 @@
+import re
 import requests
 from bs4 import BeautifulSoup
-import re
+
 
 def get_price(stock_code):
     global diff_price, diff_percent
@@ -57,3 +58,4 @@ def get_stock_code(keyword):
         return f"📌 {name}\n🔢 종목코드: {code}\n🏷️ 시장구분: {market}"
 
     return "❌ 종목을 찾을 수 없습니다."
+
