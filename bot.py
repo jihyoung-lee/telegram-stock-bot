@@ -20,7 +20,7 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     df = fetch_daily_price(stock_code)
     chart = draw_candle_chart(df, title="최근 주가 추이")
     await update.message.reply_text(result)
-    await update.message.reply_photo(photo=chart, caption="최근 5일간의 캔들 차트 입니다.")
+    await update.message.reply_photo(photo=chart)
 
 async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
