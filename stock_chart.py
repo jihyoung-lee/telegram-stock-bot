@@ -82,5 +82,6 @@ def draw_candle_chart(df, title="📊 캔들차트"):
         figsize=(12, 6),
         savefig=dict(fname=buf, format='png', bbox_inches='tight', pad_inches=0)
     )
+
     buf.seek(0)
     return buf
