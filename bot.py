@@ -1,8 +1,6 @@
 import logging
-import asyncio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
-from telegram.ext import JobQueue
 from config import TELEGRAM_BOT_TOKEN
 from stock_fetcher import get_price, get_stock_code
 from news_crawler import get_stock_news, get_main_news
