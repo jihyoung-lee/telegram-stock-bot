@@ -65,7 +65,7 @@ def draw_candle_chart(df, title="📊 캔들차트"):
 
     # 차트 그리기 + 이미지 저장
     buf = BytesIO()
-    fig, axlist = mpf.plot(
+    mpf.plot(
         df,
         type='candle',
         volume=True,
