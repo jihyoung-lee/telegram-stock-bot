@@ -36,7 +36,7 @@ def get_price(stock_code):
     emoji = direction_map.get(direction_text, "❓")
 
     if price and price.text:
-        return f"🏷️시장구분: {code_name}\n📌종목명: {name_tag.text} ({stock_code})\n 현재 주가 {price.text}원\n 전일 대비 :{emoji} {diff_price} {direction_text} ({diff_percent}%)"
+        return f"🏷️시장구분: {code_name}\n📌종목명: {name_tag.text} ({stock_code})\n 현재 주가 {price.text}원\n 전일 대비 :{emoji} {diff_price}원 {direction_text} ({diff_percent}%)"
     return "📉 주가 정보를 가져올 수 없습니다."
 
 def get_stock_code(keyword):

@@ -4,8 +4,6 @@ import mplfinance as mpf
 import matplotlib.font_manager as fm
 from io import BytesIO, StringIO
 
-
-
 def fetch_daily_price(stock_code, pages=30):
     dfs = []
     for page in range(1, pages + 1):
@@ -47,8 +45,19 @@ def draw_candle_chart(df, title="📊 캔들차트"):
     font_name = fm.FontProperties(fname=font_path).get_name()
 
     # 스타일을 charles 기반으로 만들고 폰트 지정
-    my_style = mpf.make_mpf_style(base_mpf_style='charles',
-                                  rc={'font.family': font_name,})
+    my_style = mpf.make_mpf_style(
+        base_mpf_style='nightclouds',
+        rc={
+            'font.family': font_name
+        },
+        marketcolors=mpf.make_marketcolors(
+            up='tab:red',  # 상승 시 빨간색
+            down='tab:blue',  # 하락 시 파란색
+            edge='inherit',  # 캔들 테두리 색상 상속
+            wick='gray',  # 꼬리선 색상
+            volume='in'  # 거래량 바 색상 자동
+        )
+    )
 
     # 📦 거래량 단위 자동 결정
     scale, ylabel_lower = determine_volume_unit(df)
@@ -56,7 +65,7 @@ def draw_candle_chart(df, title="📊 캔들차트"):
 
     # 차트 그리기 + 이미지 저장
     buf = BytesIO()
-    mpf.plot(
+    fig, axlist = mpf.plot(
         df,
         type='candle',
         volume=True,
@@ -64,7 +73,14 @@ def draw_candle_chart(df, title="📊 캔들차트"):
         title=title,
         ylabel='가격',
         ylabel_lower=ylabel_lower,
-        savefig=dict(fname=buf, format='png')
+        update_width_config=dict(
+            candle_linewidth=1,
+            candle_width=0.2,
+            volume_width=0.4
+        ),
+        returnfig=True,
+        figsize=(12, 6),
+        savefig=dict(fname=buf, format='png', bbox_inches='tight', pad_inches=0)
     )
     buf.seek(0)
     return buf
