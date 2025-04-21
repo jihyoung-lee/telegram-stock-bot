@@ -1,15 +1,14 @@
 import logging
-
-import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
-from config import TELEGRAM_BOT_TOKEN
+#from config import TELEGRAM_BOT_TOKEN
 from stock_fetcher import get_price, get_stock_code
 from news_crawler import get_stock_news, get_main_news
 from stock_chart import fetch_daily_price, draw_candle_chart
 from pytz import timezone
 from datetime import datetime, time
 
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 active_chat_ids = set()
 GROUP_CHAT_FILE = "group_chat_ids.txt"
 
