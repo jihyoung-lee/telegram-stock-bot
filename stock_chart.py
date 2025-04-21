@@ -4,7 +4,15 @@ import mplfinance as mpf
 import matplotlib.font_manager as fm
 from io import BytesIO, StringIO
 
-def fetch_daily_price(stock_code, pages=30):
+def fetch_daily_price(stock_code, period="1달"):
+    pages_map = {
+        "1일": 1,
+        "1주": 2,
+        "1달": 6,
+        "1년": 30,
+        "5년": 100
+    }
+    pages = pages_map.get(period, 6)
     dfs = []
     for page in range(1, pages + 1):
         url = f"https://finance.naver.com/item/sise_day.naver?code={stock_code}&page={page}"
