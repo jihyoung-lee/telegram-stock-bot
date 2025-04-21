@@ -41,7 +41,6 @@ def get_main_news():
         if href and title:
             # 상대 경로 처리
             if not href.startswith("http"):
-                href = "https://finance.naver.com" + href
-            news_list.append(f"📰 {title}\n🔗 {href}")
+                news_list.append(f"📰 {title}\n🔗 {href}")
 
     return news_list if news_list else ["뉴스가 없습니다."]
