@@ -13,6 +13,9 @@ from datetime import datetime, time
 active_chat_ids = set()
 GROUP_CHAT_FILE = "group_chat_ids.txt"
 
+PERIOD_OPTIONS = ["1일", "1주", "1달", "1년", "5년"]
+CANDLE_OPTIONS = ["일봉", "주봉", "월봉"]
+
 def save_group_chat_id(chat_id: int):
     # 이미 저장되어 있는지 확인
     try:
@@ -55,23 +58,19 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
         await update.message.reply_text("종목 코드를 입력해 주세요. 예: /price 005930")
         return
-
     stock_code = context.args[0].strip()
-    context.user_data['stock_code'] = stock_code  # 콜백에서 사용
+    context.user_data['stock_code'] = stock_code # 콜백에서 사용
+    context.user_data['period'] = "1달"
+    context.user_data['candle_type'] = "일봉"
 
     result = get_price(stock_code)
 
-    df = fetch_daily_price(stock_code, period="1달")
+    df = fetch_daily_price(stock_code, period="1달" , candle_type="일봉")
     chart = draw_candle_chart(df, title="최근 주가 추이")
 
     keyboard = [
-        [
-            InlineKeyboardButton("1일", callback_data="1일"),
-            InlineKeyboardButton("1주", callback_data="1주"),
-            InlineKeyboardButton("1달", callback_data="1달"),
-            InlineKeyboardButton("1년", callback_data="1년"),
-            InlineKeyboardButton("5년", callback_data="5년")
-        ]
+        [InlineKeyboardButton(text=label, callback_data=f"기간:{label}") for label in PERIOD_OPTIONS],
+        [InlineKeyboardButton(text=label, callback_data=f"봉:{label}") for label in CANDLE_OPTIONS]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -107,40 +106,38 @@ async def getcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    data = query.data
 
-    period = query.data
+    if data.startswith("기간:"):
+        context.user_data['period'] = data.replace("기간:", "")
+    elif data.startswith("봉:"):
+        context.user_data['candle_type'] = data.replace("봉:", "")
+
     stock_code = context.user_data.get("stock_code")
+    period = context.user_data.get("period", "1달")
+    candle_type = context.user_data.get("candle_type", "일봉")
 
     if not stock_code:
         await query.edit_message_text("❗ 먼저 /price [종목코드] 를 입력해 주세요.")
         return
 
-        # 차트 새로 그림
-    df = fetch_daily_price(stock_code, period=period)
-    chart = draw_candle_chart(df, title=f"{period} 주가 추이")
+    df = fetch_daily_price(stock_code, period=period, candle_type=candle_type)
+    chart = draw_candle_chart(df, title=f"{period} {candle_type} 추이")
 
     chart_message_id = context.user_data.get("chart_message_id")
     chart_chat_id = context.user_data.get("chart_chat_id")
 
     if chart_message_id and chart_chat_id:
-        try:
-            await context.bot.edit_message_media(
-                media=InputMediaPhoto(media=chart),
-                chat_id=chart_chat_id,
-                message_id=chart_message_id,
-                reply_markup=query.message.reply_markup  # 기존 버튼 유지
-            )
-        except telegram.error.BadRequest as e:
-            if "Message is not modified" in str(e):
-                # 같은 차트일 경우, 강제로 다시 전송
-                await context.bot.send_photo(
-                    chat_id=chart_chat_id,
-                    photo=chart,
-                    caption=f"일봉 기준 {period} 차트입니다.",
-                    reply_markup=query.message.reply_markup
-                )
+        await context.bot.edit_message_media(
+            media=InputMediaPhoto(chart),
+            chat_id=chart_chat_id,
+            message_id=chart_message_id,
+            reply_markup=query.message.reply_markup
+        )
     else:
         await context.bot.send_photo(chat_id=query.message.chat_id, photo=chart)
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()

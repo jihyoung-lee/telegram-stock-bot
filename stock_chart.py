@@ -4,7 +4,7 @@ import mplfinance as mpf
 import matplotlib.font_manager as fm
 from io import BytesIO, StringIO
 
-def fetch_daily_price(stock_code, period="1달"):
+def fetch_daily_price(stock_code, period="1달", candle_type="일봉"):
     pages_map = {
         "1일": 1,
         "1주": 2,
@@ -12,6 +12,7 @@ def fetch_daily_price(stock_code, period="1달"):
         "1년": 30,
         "5년": 100
     }
+
     pages = pages_map.get(period, 6)
     dfs = []
     for page in range(1, pages + 1):
@@ -27,7 +28,27 @@ def fetch_daily_price(stock_code, period="1달"):
     data['날짜'] = pd.to_datetime(data['날짜'])
     data = data.set_index('날짜')
     data = data.sort_index()
-    return data[['open', 'high', 'low', 'close', 'volume']]
+    df = data[['open', 'high', 'low', 'close', 'volume']]
+
+    if candle_type == "주봉":
+        df = df.resample('W').agg({
+            'open': 'first',
+            'high': 'max',
+            'low': 'min',
+            'close': 'last',
+            'volume': 'sum'
+        }).dropna()
+    elif candle_type == "월봉":
+        # ME 월말 기준
+        df = df.resample('ME').agg({
+            'open': 'first',
+            'high': 'max',
+            'low': 'min',
+            'close': 'last',
+            'volume': 'sum'
+        }).dropna()
+
+    return df
 
 def determine_volume_unit(df: pd.DataFrame):
     """
