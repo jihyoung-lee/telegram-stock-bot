@@ -136,7 +136,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_photo(
                     chat_id=chart_chat_id,
                     photo=chart,
-                    caption=f"{period} 차트입니다.",
+                    caption=f"일봉 기준 {period} 차트입니다.",
                     reply_markup=query.message.reply_markup
                 )
     else:
