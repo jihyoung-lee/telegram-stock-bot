@@ -60,9 +60,20 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     df = fetch_daily_price(stock_code)
     chart = draw_candle_chart(df, title="최근 주가 추이")
 
+    keyboard = [
+        [
+            InlineKeyboardButton("1일", callback_data="price"),
+            InlineKeyboardButton("1일", callback_data="price"),
+            InlineKeyboardButton("1일", callback_data="price"),
+            InlineKeyboardButton("1일", callback_data="price"),
+            InlineKeyboardButton("1일", callback_data="price")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
     active_chat_ids.add(update.effective_chat.id)
     await update.message.reply_text(result)
-    await update.message.reply_photo(photo=chart)
+    await update.message.reply_photo(photo=chart,reply_markup=reply_markup)
 
 async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
