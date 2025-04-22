@@ -2,12 +2,15 @@ import logging
 import os
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
+
+import db
 #from config import TELEGRAM_BOT_TOKEN
 from stock_fetcher import get_price, get_stock_code
 from news_crawler import get_stock_news, get_main_news
 from stock_chart import fetch_daily_price, draw_candle_chart
 from pytz import timezone
 from datetime import datetime, time
+from db import init_db, save_group_chat_id,load_group_chat_ids
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 active_chat_ids = set()
@@ -15,25 +18,6 @@ GROUP_CHAT_FILE = "group_chat_ids.txt"
 
 PERIOD_OPTIONS = ["1일", "1주", "1달", "1년", "5년"]
 CANDLE_OPTIONS = ["일봉", "주봉", "월봉"]
-
-def save_group_chat_id(chat_id: int):
-    # 이미 저장되어 있는지 확인
-    try:
-        with open(GROUP_CHAT_FILE, "r") as f:
-            ids = {line.strip() for line in f}
-    except FileNotFoundError:
-        ids = set()
-
-    if str(chat_id) not in ids:
-        with open(GROUP_CHAT_FILE, "a") as f:
-            f.write(str(chat_id) + "\n")
-
-def load_group_chat_ids():
-    try:
-        with open(GROUP_CHAT_FILE, "r") as f:
-            return [int(line.strip()) for line in f if line.strip()]
-    except FileNotFoundError:
-        return []
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -140,6 +124,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     logging.basicConfig(level=logging.INFO)
+
+    db.init_db()
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
