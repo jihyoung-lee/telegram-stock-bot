@@ -43,8 +43,8 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     stock_code = context.args[0].strip()
     context.user_data['stock_code'] = stock_code # 콜백에서 사용
-    context.user_data['period'] = "1달"
-    context.user_data['candle_type'] = "일봉"
+    context.user_data['period'] = "1M"
+    context.user_data['candle_type'] = "daily"
 
     result = get_price(stock_code)
 
@@ -52,8 +52,8 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chart = draw_candle_chart(df, title="Recent Price Trend")
 
     keyboard = [
-        [InlineKeyboardButton(text=label, callback_data=f"기간:{label}") for label in PERIOD_OPTIONS],
-        [InlineKeyboardButton(text=label, callback_data=f"봉:{label}") for label in CANDLE_OPTIONS]
+        [InlineKeyboardButton(text=label, callback_data=f"period:{label}") for label in PERIOD_OPTIONS],
+        [InlineKeyboardButton(text=label, callback_data=f"candle:{label}") for label in CANDLE_OPTIONS]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
