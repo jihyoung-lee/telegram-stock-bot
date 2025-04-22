@@ -143,7 +143,7 @@ def main():
 
 
     print("✅ 봇 실행 중...")
-    app.run_polling()
+    app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 
 if __name__ == "__main__":
