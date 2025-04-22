@@ -48,8 +48,8 @@ async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     result = get_price(stock_code)
 
-    df = fetch_daily_price(stock_code, period="1달" , candle_type="일봉")
-    chart = draw_candle_chart(df, title="최근 주가 추이")
+    df = fetch_daily_price(stock_code, period="1M" , candle_type="daily")
+    chart = draw_candle_chart(df, title="Recent Price Trend")
 
     keyboard = [
         [InlineKeyboardButton(text=label, callback_data=f"기간:{label}") for label in PERIOD_OPTIONS],
