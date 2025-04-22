@@ -1,5 +1,7 @@
 import logging
 import os
+
+import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, InputMediaPhoto
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 
@@ -110,15 +112,19 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chart_message_id = context.user_data.get("chart_message_id")
     chart_chat_id = context.user_data.get("chart_chat_id")
 
-    if chart_message_id and chart_chat_id:
+    try:
         await context.bot.edit_message_media(
             media=InputMediaPhoto(chart),
             chat_id=chart_chat_id,
             message_id=chart_message_id,
             reply_markup=query.message.reply_markup
         )
-    else:
-        await context.bot.send_photo(chat_id=query.message.chat_id, photo=chart)
+    except telegram.error.BadRequest as e:
+        if "Message is not modified" in str(e):
+            # 동일한 내용이면 에러 무시
+            pass
+        else:
+            raise
 
 
 def main():
