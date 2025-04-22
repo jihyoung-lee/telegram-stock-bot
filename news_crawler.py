@@ -16,12 +16,21 @@ def get_stock_news(stock_code, count=5):
     news_tags = soup.select("span.txt > a")
 
     news_list = []
-    for tag in news_tags[:count]:
+    for tag in news_tags:
+        # 관련 뉴스 필터: class에 "link_relation" 포함되면 제외
+        if "link_relation" in tag.get("class", []):
+            continue
+
         title = tag.text.strip()
         href = tag.get("href", "")
         if not href.startswith("http"):
             href = "https://finance.naver.com" + href
+
         news_list.append(f"📰 {title}\n🔗 {href}")
+        # 관련 뉴스 제외 후 정확히 5개만 수집
+        if len(news_list) >= count:
+            break
+
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
 
@@ -57,5 +66,3 @@ def get_main_news():
                     news_list.append(f"📰 {title}\n🔗 {normalized}")
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
-
-print(get_stock_news("005930"))
