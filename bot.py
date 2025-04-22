@@ -93,14 +93,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     data = query.data
 
-    if data.startswith("기간:"):
-        context.user_data['period'] = data.replace("기간:", "")
-    elif data.startswith("봉:"):
-        context.user_data['candle_type'] = data.replace("봉:", "")
+    if data.startswith("period:"):
+        context.user_data['period'] = data.replace("period:", "")
+    elif data.startswith("candle:"):
+        context.user_data['candle_type'] = data.replace("candle:", "")
 
     stock_code = context.user_data.get("stock_code")
-    period = context.user_data.get("period", "1달")
-    candle_type = context.user_data.get("candle_type", "일봉")
+    period = context.user_data.get("period", "monthly")
+    candle_type = context.user_data.get("candle_type", "daily")
 
     if not stock_code:
         await query.edit_message_text("❗ 먼저 /price [종목코드] 를 입력해 주세요.")
