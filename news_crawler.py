@@ -3,28 +3,27 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
 def get_stock_news(stock_code, count=5):
-    url = f"https://finance.naver.com/item/news_news.naver?code={stock_code}"
+    url = f"https://finance.naver.com/item/main.naver?code={stock_code}"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0",
         "Referer": "https://finance.naver.com/"
     }
 
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, "html.parser")
 
-    news_links = soup.select("td.title a")
+    # 새로 바뀐 뉴스 구조: <span class="txt"> <a href="...">제목</a> </span>
+    news_tags = soup.select("span.txt > a")
 
-    results = []
-    for a in news_links:
-        title = a.text.strip()
-        href = a.get("href", "")
+    news_list = []
+    for tag in news_tags[:count]:
+        title = tag.text.strip()
+        href = tag.get("href", "")
         if not href.startswith("http"):
             href = "https://finance.naver.com" + href
-        results.append(f"📰 {title}\n🔗 {href}")
-        if len(results) >= count:
-            break
+        news_list.append(f"📰 {title}\n🔗 {href}")
 
-    return results if results else ["뉴스가 없습니다."]
+    return news_list if news_list else ["❌ 뉴스가 없습니다."]
 
 def normalize_naver_url(href):
     """상대 경로 URL을 정규 네이버 뉴스 URL로 변환"""
@@ -58,3 +57,5 @@ def get_main_news():
                     news_list.append(f"📰 {title}\n🔗 {normalized}")
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
+
+print(get_stock_news("005930"))
