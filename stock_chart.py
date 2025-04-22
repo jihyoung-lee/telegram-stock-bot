@@ -1,16 +1,17 @@
 import requests
+import platform
 import pandas as pd
 import mplfinance as mpf
 import matplotlib.font_manager as fm
 from io import BytesIO, StringIO
 
-def fetch_daily_price(stock_code, period="1달", candle_type="일봉"):
+def fetch_daily_price(stock_code, period="1M", candle_type="daily"):
     pages_map = {
-        "1일": 1,
-        "1주": 2,
-        "1달": 6,
-        "1년": 30,
-        "5년": 100
+        "1D": 1,
+        "1W": 2,
+        "1M": 6,
+        "1Y": 30,
+        "5Y": 100
     }
 
     pages = pages_map.get(period, 6)
@@ -30,7 +31,7 @@ def fetch_daily_price(stock_code, period="1달", candle_type="일봉"):
     data = data.sort_index()
     df = data[['open', 'high', 'low', 'close', 'volume']]
 
-    if candle_type == "주봉":
+    if candle_type == "weekly":
         df = df.resample('W').agg({
             'open': 'first',
             'high': 'max',
@@ -38,7 +39,7 @@ def fetch_daily_price(stock_code, period="1달", candle_type="일봉"):
             'close': 'last',
             'volume': 'sum'
         }).dropna()
-    elif candle_type == "월봉":
+    elif candle_type == "monthly":
         # ME 월말 기준
         df = df.resample('ME').agg({
             'open': 'first',
@@ -62,23 +63,19 @@ def determine_volume_unit(df: pd.DataFrame):
     avg_volume = df['volume'].mean()
 
     if avg_volume >= 1_000_000:
-        return 1_000_000, '거래량 (백만 단위)'
+        return 1_000_000, 'Volume (M)'
     elif avg_volume >= 10_000:
-        return 10_000, '거래량 (만 단위)'
+        return 10_000, 'Volume (10K)'
     else:
-        return 1, '거래량'
+        return 1, 'Volume'
 
-def draw_candle_chart(df, title="📊 캔들차트"):
-    # 한글 폰트 강제 지정
-    font_path = "C:/Windows/Fonts/malgun.ttf"
-    font_name = fm.FontProperties(fname=font_path).get_name()
+
+def draw_candle_chart(df, title="📊 Candle Chart"):
+
 
     # 스타일을 charles 기반으로 만들고 폰트 지정
     my_style = mpf.make_mpf_style(
         base_mpf_style='nightclouds',
-        rc={
-            'font.family': font_name
-        },
         marketcolors=mpf.make_marketcolors(
             up='tab:red',  # 상승 시 빨간색
             down='tab:blue',  # 하락 시 파란색
@@ -100,7 +97,7 @@ def draw_candle_chart(df, title="📊 캔들차트"):
         volume=True,
         style=my_style,
         title=title,
-        ylabel='가격',
+        ylabel='price',
         ylabel_lower=ylabel_lower,
         update_width_config=dict(
             candle_linewidth=1,

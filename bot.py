@@ -14,10 +14,9 @@ from db import init_db, save_group_chat_id,load_group_chat_ids
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 active_chat_ids = set()
-GROUP_CHAT_FILE = "group_chat_ids.txt"
 
-PERIOD_OPTIONS = ["1일", "1주", "1달", "1년", "5년"]
-CANDLE_OPTIONS = ["일봉", "주봉", "월봉"]
+PERIOD_OPTIONS = ["1D", "1W", "1M", "1Y", "5Y"]
+CANDLE_OPTIONS = ["daily", "weekly", "monthly"]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -106,7 +105,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     df = fetch_daily_price(stock_code, period=period, candle_type=candle_type)
-    chart = draw_candle_chart(df, title=f"{period} {candle_type} 추이")
+    chart = draw_candle_chart(df, title=f"{period} {candle_type} Price Trend")
 
     chart_message_id = context.user_data.get("chart_message_id")
     chart_chat_id = context.user_data.get("chart_chat_id")
@@ -125,7 +124,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    db.init_db()
+    init_db()
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
