@@ -88,7 +88,7 @@ async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
     news_list = get_stock_news(stock_code)
 
     active_chat_ids.add(update.effective_chat.id)
-    await update.message.reply_text("\n\n".join(news_list))
+    await update.message.reply_text("\n\n".join(news_list), parse_mode="markdown")
 
 async def getcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
@@ -151,7 +151,6 @@ def main():
     app.add_handler(CommandHandler("price", price))
     app.add_handler(CommandHandler("news", news))
     app.add_handler(CommandHandler("getcode", getcode))
-    app.add_handler(CommandHandler("predict", predict))
 
     app.add_handler(CallbackQueryHandler(button_callback))
 

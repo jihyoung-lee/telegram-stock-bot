@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
-
 def get_stock_news(stock_code, count=5):
     url = f"https://finance.naver.com/item/main.naver?code={stock_code}"
     headers = {
@@ -13,12 +12,10 @@ def get_stock_news(stock_code, count=5):
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, "html.parser")
 
-    # 새로 바뀐 뉴스 구조: <span class="txt"> <a href="...">제목</a> </span>
     news_tags = soup.select("span.txt > a")
 
     news_list = []
     for tag in news_tags:
-        # 관련 뉴스 필터: class에 "link_relation" 포함되면 제외
         if "link_relation" in tag.get("class", []):
             continue
 
@@ -27,11 +24,10 @@ def get_stock_news(stock_code, count=5):
         if not href.startswith("http"):
             href = "https://finance.naver.com" + href
 
-        news_list.append(f"📰 {title}\n🔗 {href}")
-        # 관련 뉴스 제외 후 정확히 5개만 수집
+        #  제목 하이퍼링크 (Markdown)
+        news_list.append(f"📰 [{title}]({href})")
         if len(news_list) >= count:
             break
-
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
 
@@ -60,7 +56,7 @@ def get_main_news():
         href = a.get("href")
         if href and title:
             if href.startswith("http"):
-                news_list.append(f"📰 {title}\n🔗 {href}")
+                news_list.append(f"📰 [{title}]({href})")
             else:
                 normalized = normalize_naver_url(href)
                 if normalized:
