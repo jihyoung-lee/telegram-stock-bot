@@ -151,6 +151,7 @@ def main():
     app.add_handler(CommandHandler("price", price))
     app.add_handler(CommandHandler("news", news))
     app.add_handler(CommandHandler("getcode", getcode))
+    app.add_handler(CommandHandler("predict", predict))
 
     app.add_handler(CallbackQueryHandler(button_callback))
 
