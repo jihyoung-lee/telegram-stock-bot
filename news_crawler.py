@@ -16,15 +16,39 @@ def get_stock_news(stock_code, count=5):
     news_tags = soup.select("div.section.new_bbs ul li span.txt > a")
 
     news_list = []
+
+    # 예측 기능 카운트
+    ho_count = 0
+    ak_count = 0
+
     for tag in news_tags:
         title = tag.get_text(strip=True)
         href = tag.get("href", "")
         if not title or "관련" in title:
             continue
         full_url = "https://finance.naver.com" + href
-        news_list.append(f"📰 [{title}]({full_url})")
+
+        # 뉴스 감성 분류
+        result, confidence = request_prediction(title)
+        if result == "호재":
+            ho_count += 1
+        elif result == "악재":
+            ak_count += 1
+
+        news_list.append(f"📰 [{title}]({full_url})→ {result}")
         if len(news_list) >= count:
             break
+    if ho_count > ak_count:
+        summary = "🟢 오늘 뉴스 요약: **호재 경향**"
+    elif ak_count > ho_count:
+        summary = "🔴 오늘 뉴스 요약: **악재 경향**"
+    else:
+        summary = "⚪️ 오늘 뉴스 요약: **판단 유보 (동률)**"
+
+    news_list.append("")
+    news_list.append(f"🟢 호재 {ho_count}개")
+    news_list.append(f"🔴 악재 {ak_count}개")
+    news_list.append(summary)
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
 
@@ -57,7 +81,7 @@ def get_main_news():
             else:
                 normalized = normalize_naver_url(href)
                 if normalized:
-                    news_list.append(f"📰 {title}\n🔗 {normalized}")
+                    news_list.append(f"📰 [{title}]({normalized})")
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
 
