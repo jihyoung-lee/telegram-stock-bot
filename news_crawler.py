@@ -2,8 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
-from lxml.parser import result
-
 
 def get_stock_news(stock_code, count=5):
     url = f"https://finance.naver.com/item/main.naver?code={stock_code}"
