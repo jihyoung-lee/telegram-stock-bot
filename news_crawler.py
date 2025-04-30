@@ -2,6 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
+from lxml.parser import result
+
+
 def get_stock_news(stock_code, count=5):
     url = f"https://finance.naver.com/item/main.naver?code={stock_code}"
     headers = {
@@ -66,3 +69,14 @@ def get_main_news():
                     news_list.append(f"📰 {title}\n🔗 {normalized}")
 
     return news_list if news_list else ["❌ 뉴스가 없습니다."]
+
+def request_prediction(text):
+    url = "https://2ff8-211-213-33-230.ngrok-free.app/predict"
+    payload = {"text": text}
+    try:
+        response = requests.post(url, json=payload)
+        result=response.json()
+        return result["result"], result["confidence"]
+    except Exception as e:
+        print(f"❌ 오류 발생: {e}")  # 콘솔에 오류 이유 출력
+        return "오류", 0

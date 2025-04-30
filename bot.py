@@ -8,7 +8,7 @@ from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandle
 import db
 #from config import TELEGRAM_BOT_TOKEN
 from stock_fetcher import get_price, get_stock_code
-from news_crawler import get_stock_news, get_main_news
+from news_crawler import get_stock_news, get_main_news, request_prediction
 from stock_chart import fetch_daily_price, draw_candle_chart
 from pytz import timezone
 from datetime import datetime, time
@@ -26,6 +26,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         save_group_chat_id(chat.id)
     await update.message.reply_text("안녕하세요! 📈 최신 주식 정보를 제공하는 봇입니다 ")
 
+async def predict(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+
+    if not context.args:
+        await update.message.reply_text("내용을 입력해주세요. 예: /predict 주식 상승")
+        return
+
+    text = ' '.join(context.args)  # 전체 문장으로 합치기
+    label, confidence = request_prediction(text)
+
+    if label == "오류":
+        await update.message.reply_text("예측 중 오류가 발생했습니다.")
+    else:
+        await update.message.reply_text(f'「{text}」 → {label} ({confidence:.2f}%)')
 
 async def send_daily_stock_news(context: ContextTypes.DEFAULT_TYPE):
     news_list = get_main_news()
