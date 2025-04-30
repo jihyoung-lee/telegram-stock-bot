@@ -2,30 +2,27 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
+
 def get_stock_news(stock_code, count=5):
     url = f"https://finance.naver.com/item/main.naver?code={stock_code}"
     headers = {
-        "User-Agent": "Mozilla/5.0",
-        "Referer": "https://finance.naver.com/"
+        "User-Agent": "Mozilla/5.0"
     }
 
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, "html.parser")
 
-    news_tags = soup.select("span.txt > a")
+    # 최신 뉴스 영역 크롤링
+    news_tags = soup.select("div.section.new_bbs ul li span.txt > a")
 
     news_list = []
     for tag in news_tags:
-        if "link_relation" in tag.get("class", []):
-            continue
-
-        title = tag.text.strip()
+        title = tag.get_text(strip=True)
         href = tag.get("href", "")
-        if not href.startswith("http"):
-            href = "https://finance.naver.com" + href
-
-        #  제목 하이퍼링크 (Markdown)
-        news_list.append(f"📰 [{title}]({href})")
+        if not title or "관련" in title:
+            continue
+        full_url = "https://finance.naver.com" + href
+        news_list.append(f"📰 [{title}]({full_url})")
         if len(news_list) >= count:
             break
 
@@ -74,3 +71,5 @@ def request_prediction(text):
     except Exception as e:
         print(f"❌ 오류 발생: {e}")  # 콘솔에 오류 이유 출력
         return "오류", 0
+
+print(get_stock_news("005930"))
