@@ -14,8 +14,8 @@ A Telegram bot that delivers real-time stock information, daily major news updat
   <tr>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/49a15363-d570-4fa9-90a0-016cb15bfbef" width="120"/><br/>
-      <b>News Update</b><br/>
-      Sends daily major stock market news before trading starts
+      <b>Market Summaries</b><br/>
+      Classification of good/bad sentiment with stock-related news
     </td>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/d1f4a789-1299-4724-9576-501a59e0c2b4" width="120"/><br/>
@@ -24,8 +24,8 @@ A Telegram bot that delivers real-time stock information, daily major news updat
     </td>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/9b491fb1-4cf8-4ca3-ae33-e5df9b3dcc12" width="120"/><br/>
-      <b>Market Summaries</b><br/>
-      Get concise summaries of stock market movements
+      <b>News Update</b><br/>
+      Sends daily major stock market news before trading starts
     </td>
   </tr>
 </table>
