@@ -70,7 +70,7 @@ pip install -r requirements.txt
 
 # Add your Telegram Bot Token in a .env file
 # Run the bot
-python main.py
+python bot.py
 ```
 
 ---
