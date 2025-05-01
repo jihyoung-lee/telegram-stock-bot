@@ -95,5 +95,3 @@ def request_prediction(text):
     except Exception as e:
         print(f"❌ 오류 발생: {e}")  # 콘솔에 오류 이유 출력
         return "오류", 0
-
-print(get_stock_news("005930"))
